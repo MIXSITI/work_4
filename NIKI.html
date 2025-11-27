@@ -66,28 +66,19 @@
 
         function NicknameGenerator() {
             const [nickname, setNickname] = useState('');
-            const [history, setHistory] = useState([]);
             const [notification, setNotification] = useState('');
 
             const generateNickname = () => {
                 const newNickname = `${getRandom(adjectives)}${getRandom(nouns)}`;
                 setNickname(newNickname);
                 setNotification('');
-
-                setHistory(prevHistory => {
-                    if (prevHistory.length > 0 && prevHistory[0] === newNickname) {
-                        return prevHistory;
-                    }
-                    const newHistory = [newNickname, ...prevHistory];
-                    return newHistory.slice(0, 10);
-                });
             };
 
             const copyToClipboard = () => {
                 if (!nickname) return;
 
                 navigator.clipboard.writeText(nickname).then(() => {
-                    setNotification('✓ Скопировано в буфер обмена!');
+                    setNotification('Скопировано в буфер обмена!');
                     setTimeout(() => setNotification(''), 2000);
                 }).catch(() => {
                     const textarea = document.createElement('textarea');
@@ -97,61 +88,33 @@
                     document.execCommand('copy');
                     document.body.removeChild(textarea);
 
-                    setNotification('✓ Скопировано в буфер обмена!');
+                    setNotification('Скопировано в буфер обмена!');
                     setTimeout(() => setNotification(''), 2000);
                 });
             };
 
-            const selectFromHistory = (selectedNickname) => {
-                setNickname(selectedNickname);
-                setNotification('');
-            };
-
             return (
-                <div className="container">
-                    <h1>🎭 Генератор Никнеймов</h1>
+                <div>
+                    <h1>Генератор никнеймов</h1>
 
-                    <div className="generator-section">
-                        <div className={`nickname-display ${nickname ? '' : 'empty'}`}>
-                            {nickname || 'Нажмите на кнопку ниже'}
-                        </div>
-
-                        <div className="button-group">
-                            <button className="btn-generate" onClick={generateNickname}>
-                                Сгенерировать никнейм
-                            </button>
-                            <button 
-                                className="btn-copy" 
-                                onClick={copyToClipboard} 
-                                disabled={!nickname}
-                            >
-                                Копировать
-                            </button>
-                        </div>
-
-                        <div className="notification">
-                            {notification}
-                        </div>
+                    <div id="nicknameDisplay">
+                        {nickname || 'Нажмите на кнопку ниже'}
                     </div>
 
-                    <div className="history-section">
-                        <div className="history-title">📋 История</div>
-                        <div className="history-list">
-                            {history.length === 0 ? (
-                                <div className="empty-message">История пуста</div>
-                            ) : (
-                                history.map((item, index) => (
-                                    <div 
-                                        key={index}
-                                        className="history-item"
-                                        onClick={() => selectFromHistory(item)}
-                                        title="Кликните для выбора"
-                                    >
-                                        {item}
-                                    </div>
-                                ))
-                            )}
-                        </div>
+                    <div>
+                        <button onClick={generateNickname}>
+                            Сгенерировать никнейм
+                        </button>
+                        <button 
+                            onClick={copyToClipboard} 
+                            disabled={!nickname}
+                        >
+                            Копировать
+                        </button>
+                    </div>
+
+                    <div id="notification">
+                        {notification}
                     </div>
                 </div>
             );
@@ -161,3 +124,4 @@
     </script>
 </body>
 </html>
+
