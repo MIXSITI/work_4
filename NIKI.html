@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор никнеймов - React</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState } = React;
+
+        const adjectives = [
+            'Молниеносный',
+            'Лазурный',
+            'Тихий',
+            'Железный',
+            'Весёлый',
+            'Грозный',
+            'Смелый',
+            'Ночной',
+            'Солнечный',
+            'Звёздный',
+            'Ледяной',
+            'Пламенный',
+            'Мудрый',
+            'Быстрый',
+            'Сильный',
+            'Дикий',
+            'Верный',
+            'Честный',
+            'Гордый',
+            'Свободный'
+        ];
+
+        const nouns = [
+            'Тигр',
+            'Питон',
+            'Шторм',
+            'Рыцарь',
+            'Гепард',
+            'Ястреб',
+            'Волк',
+            'Орёл',
+            'Лев',
+            'Феникс',
+            'Дракон',
+            'Кот',
+            'Сокол',
+            'Медведь',
+            'Лиса',
+            'Акула',
+            'Змея',
+            'Нокс',
+            'Кровь',
+            'Тень'
+        ];
+
+        function getRandom(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function NicknameGenerator() {
+            const [nickname, setNickname] = useState('');
+            const [history, setHistory] = useState([]);
+            const [notification, setNotification] = useState('');
+
+            const generateNickname = () => {
+                const newNickname = `${getRandom(adjectives)}${getRandom(nouns)}`;
+                setNickname(newNickname);
+                setNotification('');
+
+                setHistory(prevHistory => {
+                    if (prevHistory.length > 0 && prevHistory[0] === newNickname) {
+                        return prevHistory;
+                    }
+                    const newHistory = [newNickname, ...prevHistory];
+                    return newHistory.slice(0, 10);
+                });
+            };
+
+            const copyToClipboard = () => {
+                if (!nickname) return;
+
+                navigator.clipboard.writeText(nickname).then(() => {
+                    setNotification('✓ Скопировано в буфер обмена!');
+                    setTimeout(() => setNotification(''), 2000);
+                }).catch(() => {
+                    const textarea = document.createElement('textarea');
+                    textarea.value = nickname;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+
+                    setNotification('✓ Скопировано в буфер обмена!');
+                    setTimeout(() => setNotification(''), 2000);
+                });
+            };
+
+            const selectFromHistory = (selectedNickname) => {
+                setNickname(selectedNickname);
+                setNotification('');
+            };
+
+            return (
+                <div className="container">
+                    <h1>🎭 Генератор Никнеймов</h1>
+
+                    <div className="generator-section">
+                        <div className={`nickname-display ${nickname ? '' : 'empty'}`}>
+                            {nickname || 'Нажмите на кнопку ниже'}
+                        </div>
+
+                        <div className="button-group">
+                            <button className="btn-generate" onClick={generateNickname}>
+                                Сгенерировать никнейм
+                            </button>
+                            <button 
+                                className="btn-copy" 
+                                onClick={copyToClipboard} 
+                                disabled={!nickname}
+                            >
+                                Копировать
+                            </button>
+                        </div>
+
+                        <div className="notification">
+                            {notification}
+                        </div>
+                    </div>
+
+                    <div className="history-section">
+                        <div className="history-title">📋 История</div>
+                        <div className="history-list">
+                            {history.length === 0 ? (
+                                <div className="empty-message">История пуста</div>
+                            ) : (
+                                history.map((item, index) => (
+                                    <div 
+                                        key={index}
+                                        className="history-item"
+                                        onClick={() => selectFromHistory(item)}
+                                        title="Кликните для выбора"
+                                    >
+                                        {item}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<NicknameGenerator />, document.getElementById('root'));
+    </script>
+</body>
+</html>
